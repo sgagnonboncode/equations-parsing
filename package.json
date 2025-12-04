@@ -1,0 +1,19 @@
+{
+  "name": "equations-parsing",
+  "version": "1.0.0",
+  "description": "TypeScript module for parsing and evaluating mathematical formulas",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node dist/test.js"
+  },
+  "keywords": ["formula", "parser", "evaluator", "typescript"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
