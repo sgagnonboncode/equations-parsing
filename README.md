@@ -2,6 +2,12 @@
 
 A TypeScript module for parsing and evaluating mathematical formulas with alphabetical variables.
 
+## 🚀 Live Demo
+
+**[Try the Interactive Demo](https://sgagnonboncode.github.io/equations-parsing/)**
+
+The demo website showcases all features with real-time validation, dynamic variable inputs, and live calculations.
+
 ## Features
 
 - Parse mathematical formulas with variables represented by consecutive alphabetical characters and underscores
