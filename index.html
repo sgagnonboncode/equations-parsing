@@ -313,6 +313,12 @@
             <span class="example-formula" onclick="setFormula('(Temperature_fahrenheit - 32) * 5/9')">(Temperature_fahrenheit - 32) * 5/9</span>
             <span class="example-formula" onclick="setFormula('sqrt(sqrt(a + b))')">sqrt(sqrt(a + b))</span>
             <span class="example-formula" onclick="setFormula('alpha * beta_gamma + sqrt(delta)')">alpha * beta_gamma + sqrt(delta)</span>
+            
+            <h4 style="margin-top: 20px; margin-bottom: 10px; color: #dc3545; font-size: 0.9rem;">❌ Invalid examples (test validation):</h4>
+            <span class="example-formula" onclick="setFormula('5a + b')" style="border: 1px dashed #dc3545;">5a + b</span>
+            <span class="example-formula" onclick="setFormula('a + 3b')" style="border: 1px dashed #dc3545;">a + 3b</span>
+            <span class="example-formula" onclick="setFormula('sqrt(a) + b4b4')" style="border: 1px dashed #dc3545;">sqrt(a) + b4b4</span>
+            <span class="example-formula" onclick="setFormula('a +')" style="border: 1px dashed #dc3545;">a +</span>
         </div>
         
         <div class="footer">
@@ -375,14 +381,32 @@
                             number += formula[i];
                             i++;
                         }
+                        
+                        // Check if number is immediately followed by a letter (invalid: 5a, 9b, etc.)
+                        if (i < formula.length && /[a-zA-Z]/.test(formula[i])) {
+                            throw new Error(`Invalid token: ${number}${formula[i]}. Numbers cannot be directly followed by letters.`);
+                        }
+                        
                         tokens.push(number);
                     }
                     else if (/[a-zA-Z]/.test(formula[i])) {
                         let variable = '';
-                        while (i < formula.length && /[a-zA-Z_]/.test(formula[i])) {
+                        let hasInvalidSequence = false;
+                        
+                        while (i < formula.length && /[a-zA-Z_0-9]/.test(formula[i])) {
+                            if (/\d/.test(formula[i]) && variable.length > 0) {
+                                // Found a number after letters - this is invalid
+                                hasInvalidSequence = true;
+                            }
                             variable += formula[i];
                             i++;
                         }
+                        
+                        // Check for invalid patterns like mixing letters and numbers
+                        if (hasInvalidSequence || /\d/.test(variable)) {
+                            throw new Error(`Invalid variable name: ${variable}. Variable names can only contain letters and underscores.`);
+                        }
+                        
                         tokens.push(variable);
                     }
                     else if (this.OPERATORS.includes(formula[i])) {
