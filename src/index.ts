@@ -74,6 +74,12 @@ export class FormulaEvaluator {
           number += formula[i];
           i++;
         }
+        
+        // Check if number is immediately followed by a letter (invalid: 5a, 9b, etc.)
+        if (i < formula.length && /[a-zA-Z]/.test(formula[i])) {
+          throw new Error(`Invalid token: ${number}${formula[i]}. Numbers cannot be directly followed by letters.`);
+        }
+        
         tokens.push(number);
       }
       // Variables (consecutive alphabetical characters and underscores)
