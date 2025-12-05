@@ -208,7 +208,8 @@ try {
     'a+b(+c)',       // Invalid parenthesis placement
     'a + sqrt)b)',   // Invalid sqrt syntax with misplaced parentheses
     'sqrt(a) + b4b4', // Invalid variable name with numbers
-    '(Temperature_fahrenheit - 32) * 5/9b' // Invalid number-letter combination
+    '(Temperature_fahrenheit - 32) * 5/9b', // Invalid number-letter combination
+    '(Temperature_fahrenheit - 32) * 5/0b'  // Invalid number-letter combination with zero
   ];
   
   console.log('Testing invalid formulas:');
@@ -219,6 +220,31 @@ try {
     if (isValid) allInvalidPass = false;
   });
   console.log(`All invalid formulas test: ${allInvalidPass ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 16: validateFormula on all previous test formulas
+  console.log('Test 16: validateFormula on all previous test formulas');
+  const previousTestFormulas = [
+    'a + b',                                    // Test 1
+    'a * b + c / d',                           // Test 2  
+    '(a + b) * c',                             // Test 3
+    'alpha + beta * gamma',                    // Test 4
+    'a ^ b + c',                               // Test 5
+    'x * y + z',                               // Test 6
+    '(tempF - 32) * 5/9',                      // Test 7
+    '(Temperature_fahrenheit - 32) * 5/9',     // Test 8
+    'sqrt(a) + b',                             // Test 9
+    'a + sqrt(b * c)',                         // Test 10
+    'sqrt(sqrt(a+b))'                          // Test 13
+  ];
+  
+  console.log('Testing validateFormula on all previous test formulas:');
+  let allPreviousValid = true;
+  previousTestFormulas.forEach((formula, index) => {
+    const isValid = validateFormula(formula);
+    console.log(`  ${index + 1}. "${formula}" → ${isValid ? '✓ Valid' : '✗ Invalid (should be valid)'}`);
+    if (!isValid) allPreviousValid = false;
+  });
+  console.log(`All previous test formulas validation: ${allPreviousValid ? 'PASS' : 'FAIL'}\n`);
 
   console.log('=== All tests completed successfully! ===');
 
