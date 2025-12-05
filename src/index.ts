@@ -355,6 +355,14 @@ export class FormulaEvaluator {
           // Check for empty sqrt parentheses - sqrt()
           if (i + 2 < tokens.length && tokens[i + 2] === ')') return false;
         }
+        
+        // Check for consecutive operands (variables/numbers without operators)
+        if (/^[a-zA-Z_]+$/.test(token) || /^\d+\.?\d*$/.test(token)) {
+          // If this is a variable or number, check if the next token is also a variable/number
+          if (nextToken && (/^[a-zA-Z_]+$/.test(nextToken) || /^\d+\.?\d*$/.test(nextToken))) {
+            return false; // Two consecutive operands without operator
+          }
+        }
       }
       
       // Convert to postfix to validate syntax and operator precedence

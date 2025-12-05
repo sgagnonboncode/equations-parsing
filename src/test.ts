@@ -209,7 +209,8 @@ try {
     'a + sqrt)b)',   // Invalid sqrt syntax with misplaced parentheses
     'sqrt(a) + b4b4', // Invalid variable name with numbers
     '(Temperature_fahrenheit - 32) * 5/9b', // Invalid number-letter combination
-    '(Temperature_fahrenheit - 32) * 5/0b'  // Invalid number-letter combination with zero
+    '(Temperature_fahrenheit - 32) * 5/0b', // Invalid number-letter combination with zero
+    'sqrt(a) + b 3'  // Space between variable and number (implicit multiplication)
   ];
   
   console.log('Testing invalid formulas:');
