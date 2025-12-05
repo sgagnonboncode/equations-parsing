@@ -5,7 +5,7 @@ A TypeScript module for parsing and evaluating mathematical formulas with alphab
 ## Features
 
 - Parse mathematical formulas with variables represented by consecutive alphabetical characters and underscores
-- Support for basic arithmetic operations: `+`, `-`, `*`, `/`, `^` (power)
+- Support for basic arithmetic operations: `+`, `-`, `*`, `/`, `^` (power), `sqrt` (square root)
 - Support for parentheses for operation precedence
 - Multi-character variable names (e.g., `alpha`, `beta`, `gamma`)
 - Automatic variable extraction and sorting
@@ -59,6 +59,7 @@ console.log(result);
 - Multiplication: `*`
 - Division: `/`
 - Power: `^`
+- Square root: `sqrt`
 - Parentheses: `(`, `)`
 
 ## Variable Naming
@@ -96,6 +97,9 @@ evaluateFormula('(a + b) * c', [2, 3, 4]); // 20
 
 // Power operation
 evaluateFormula('a ^ b + c', [2, 3, 1]); // 9
+
+// Square root
+evaluateFormula('sqrt(a) + b', [16, 4]); // 8
 
 // Multi-character variables with underscores
 evaluateFormula('Temperature_fahrenheit * conversion_factor', [68, 1.8]); // 122.4

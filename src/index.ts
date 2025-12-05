@@ -18,13 +18,14 @@ export interface VariableAssignment {
  * and evaluates them with given variable values
  */
 export class FormulaEvaluator {
-  private static readonly OPERATORS = ['+', '-', '*', '/', '(', ')', '^'];
+  private static readonly OPERATORS = ['+', '-', '*', '/', '(', ')', '^', 'sqrt'];
   private static readonly PRECEDENCE: { [key: string]: number } = {
     '+': 1,
     '-': 1,
     '*': 2,
     '/': 2,
-    '^': 3
+    '^': 3,
+    'sqrt': 4
   };
 
   /**
@@ -41,7 +42,10 @@ export class FormulaEvaluator {
           variable += formula[i];
           i++;
         }
-        variables.add(variable);
+        // Don't include sqrt as a variable
+        if (variable !== 'sqrt') {
+          variables.add(variable);
+        }
       } else {
         i++;
       }
@@ -79,7 +83,9 @@ export class FormulaEvaluator {
           variable += formula[i];
           i++;
         }
+        
         tokens.push(variable);
+        
       }
       // Operators and parentheses
       else if (this.OPERATORS.includes(formula[i])) {
@@ -103,8 +109,12 @@ export class FormulaEvaluator {
 
     for (const token of tokens) {
       // Numbers and variables go directly to output
-      if (/^\d+\.?\d*$/.test(token) || /^[a-zA-Z_]+$/.test(token)) {
+      if (/^\d+\.?\d*$/.test(token) || (/^[a-zA-Z_]+$/.test(token) && token !== 'sqrt')) {
         output.push(token);
+      }
+      // sqrt function
+      else if (token === 'sqrt') {
+        operators.push(token);
       }
       // Left parenthesis
       else if (token === '(') {
@@ -122,14 +132,19 @@ export class FormulaEvaluator {
       }
       // Operators
       else if (token in this.PRECEDENCE) {
-        while (
-          operators.length > 0 &&
-          operators[operators.length - 1] !== '(' &&
-          this.PRECEDENCE[operators[operators.length - 1]] >= this.PRECEDENCE[token]
-        ) {
-          output.push(operators.pop()!);
+        // sqrt is a unary function, handle it specially
+        if (token === 'sqrt') {
+          operators.push(token);
+        } else {
+          while (
+            operators.length > 0 &&
+            operators[operators.length - 1] !== '(' &&
+            this.PRECEDENCE[operators[operators.length - 1]] >= this.PRECEDENCE[token]
+          ) {
+            output.push(operators.pop()!);
+          }
+          operators.push(token);
         }
-        operators.push(token);
       }
       else {
         throw new Error(`Unknown token: ${token}`);
@@ -160,7 +175,7 @@ export class FormulaEvaluator {
         stack.push(parseFloat(token));
       }
       // Variables
-      else if (/^[a-zA-Z_]+$/.test(token)) {
+      else if (/^[a-zA-Z_]+$/.test(token) && token !== 'sqrt') {
         if (!(token in variables)) {
           throw new Error(`Variable '${token}' not provided`);
         }
@@ -168,33 +183,46 @@ export class FormulaEvaluator {
       }
       // Operators
       else if (token in this.PRECEDENCE) {
-        if (stack.length < 2) {
-          throw new Error(`Insufficient operands for operator '${token}'`);
-        }
-        const b = stack.pop()!;
-        const a = stack.pop()!;
-        
-        switch (token) {
-          case '+':
-            stack.push(a + b);
-            break;
-          case '-':
-            stack.push(a - b);
-            break;
-          case '*':
-            stack.push(a * b);
-            break;
-          case '/':
-            if (b === 0) {
-              throw new Error('Division by zero');
-            }
-            stack.push(a / b);
-            break;
-          case '^':
-            stack.push(Math.pow(a, b));
-            break;
-          default:
-            throw new Error(`Unknown operator: ${token}`);
+        // Handle sqrt as unary operator
+        if (token === 'sqrt') {
+          if (stack.length < 1) {
+            throw new Error(`Insufficient operands for sqrt function`);
+          }
+          const a = stack.pop()!;
+          if (a < 0) {
+            throw new Error('Cannot take square root of negative number');
+          }
+          stack.push(Math.sqrt(a));
+        } else {
+          // Handle binary operators
+          if (stack.length < 2) {
+            throw new Error(`Insufficient operands for operator '${token}'`);
+          }
+          const b = stack.pop()!;
+          const a = stack.pop()!;
+          
+          switch (token) {
+            case '+':
+              stack.push(a + b);
+              break;
+            case '-':
+              stack.push(a - b);
+              break;
+            case '*':
+              stack.push(a * b);
+              break;
+            case '/':
+              if (b === 0) {
+                throw new Error('Division by zero');
+              }
+              stack.push(a / b);
+              break;
+            case '^':
+              stack.push(Math.pow(a, b));
+              break;
+            default:
+              throw new Error(`Unknown operator: ${token}`);
+          }
         }
       }
       else {

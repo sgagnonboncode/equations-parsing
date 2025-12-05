@@ -100,6 +100,77 @@ try {
   console.log('Expected: 20°C');
   console.log(`✓ ${result8 === 20 ? 'PASS' : 'FAIL'}\n`);
 
+  // Test 9: Square root operation
+  console.log('Test 9: Square root operation (sqrt(a) + b)');
+  const formula9 = 'sqrt(a) + b';
+  const values9 = [16, 4]; // sqrt(16) + 4 = 4 + 4 = 8
+  const result9 = evaluateFormula(formula9, values9);
+  console.log(`Formula: ${formula9}`);
+  console.log(`Variables: ${getFormulaVariables(formula9).join(', ')}`);
+  console.log(`Values: [${values9.join(', ')}]`);
+  console.log(`Result: ${result9}`);
+  console.log('Expected: 8');
+  console.log(`✓ ${result9 === 8 ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 10: Complex expression with square root
+  console.log('Test 10: Complex expression (a + sqrt(b * c))');
+  const formula10 = 'a + sqrt(b * c)';
+  const values10 = [10, 9, 4]; // 10 + sqrt(9 * 4) = 10 + sqrt(36) = 10 + 6 = 16
+  const result10 = evaluateFormula(formula10, values10);
+  console.log(`Formula: ${formula10}`);
+  console.log(`Variables: ${getFormulaVariables(formula10).join(', ')}`);
+  console.log(`Values: [${values10.join(', ')}]`);
+  console.log(`Result: ${result10}`);
+  console.log('Expected: 16');
+  console.log(`✓ ${result10 === 16 ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 11: Error handling - sqrt used incorrectly as variable
+  console.log('Test 11: Error handling - sqrt used incorrectly as variable (sqrt + a)');
+  try {
+    const formula11 = 'sqrt + a';
+    const values11 = [5, 10]; // Trying to use sqrt as a variable
+    const result11 = evaluateFormula(formula11, values11);
+    console.log(`Formula: ${formula11}`);
+    console.log(`Values: [${values11.join(', ')}]`);
+    console.log(`Result: ${result11}`);
+    console.log('✗ FAIL: Should have thrown an error');
+  } catch (error) {
+    console.log(`Formula: sqrt + a`);
+    console.log(`Error caught: ${error instanceof Error ? error.message : String(error)}`);
+    console.log('Expected: Error because sqrt should be used as sqrt(expression), not as a variable');
+    console.log('✓ PASS: Correctly rejected sqrt used as variable\n');
+  }
+
+  // Test 12: Error handling - sqrt without parentheses  
+  console.log('Test 12: Error handling - sqrt without parentheses (a * sqrt)');
+  try {
+    const formula12 = 'a * sqrt';
+    const values12 = [5];
+    const result12 = evaluateFormula(formula12, values12);
+    console.log(`Formula: ${formula12}`);
+    console.log(`Values: [${values12.join(', ')}]`);
+    console.log(`Result: ${result12}`);
+    console.log('✗ FAIL: Should have thrown an error');
+  } catch (error) {
+    console.log(`Formula: a * sqrt`);
+    console.log(`Error caught: ${error instanceof Error ? error.message : String(error)}`);
+    console.log('Expected: Error because sqrt needs parentheses sqrt(expression)');
+    console.log('✓ PASS: Correctly rejected sqrt without parentheses\n');
+  }
+
+  // Test 13: Nested square root operation
+  console.log('Test 13: Nested square root operation (sqrt(sqrt(a+b)))');
+  const formula13 = 'sqrt(sqrt(a+b))';
+  const values13 = [100, 156]; // sqrt(sqrt(100+156)) = sqrt(sqrt(256)) = sqrt(16) = 4
+  const result13 = evaluateFormula(formula13, values13);
+  console.log(`Formula: ${formula13}`);
+  console.log(`Variables: ${getFormulaVariables(formula13).join(', ')}`);
+  console.log(`Values: [${values13.join(', ')}] (a=100, b=156)`);
+  console.log(`Calculation: sqrt(sqrt(${values13[0]}+${values13[1]})) = sqrt(sqrt(256)) = sqrt(16) = 4`);
+  console.log(`Result: ${result13}`);
+  console.log('Expected: 4');
+  console.log(`✓ ${result13 === 4 ? 'PASS' : 'FAIL'}\n`);
+
   console.log('=== All tests completed successfully! ===');
 
 } catch (error) {
