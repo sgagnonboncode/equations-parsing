@@ -64,17 +64,25 @@ try {
   console.log('Expected: 9');
   console.log(`✓ ${result5 === 9 ? 'PASS' : 'FAIL'}\n`);
 
-  // Test 6: Detailed result object
-  console.log('Test 6: Using FormulaEvaluator.evaluate for detailed result');
-  const formula6 = 'x * y + z';
-  const variables6 = {x: 3, y: 4, z: 5};
-  const detailedResult = FormulaEvaluator.evaluate(formula6, variables6);
+  // Test 6: Complex formula with nested operations and multiple functions
+  console.log('Test 6: Complex nested formula (sqrt((a + b) ^ 2 + c * d) / (e - f) + sqrt(g))');
+  const formula6 = 'sqrt((a + b) ^ 2 + c * d) / (e - f) + sqrt(g)';
+  const variables6 = {a: 3, b: 4, c: 5, d: 6, e: 10, f: 2, g: 16};
+  const result6 = FormulaEvaluator.evaluate(formula6, variables6);
   console.log(`Formula: ${formula6}`);
-  console.log(`Variables found: [${detailedResult.variables.join(', ')}]`);
+  console.log(`Variables found: [${getFormulaVariables(formula6).join(', ')}]`);
   console.log(`Values: ${JSON.stringify(variables6)}`);
-  console.log(`Result: ${detailedResult.result}`);
-  console.log('Expected: 17');
-  console.log(`✓ ${detailedResult.result === 17 ? 'PASS' : 'FAIL'}\n`);
+  console.log(`Calculation breakdown:`);
+  console.log(`  (a + b) ^ 2 = (3 + 4) ^ 2 = 7 ^ 2 = 49`);
+  console.log(`  c * d = 5 * 6 = 30`);
+  console.log(`  sqrt(49 + 30) = sqrt(79) ≈ 8.888`);
+  console.log(`  e - f = 10 - 2 = 8`);
+  console.log(`  sqrt(79) / 8 ≈ 1.111`);
+  console.log(`  sqrt(g) = sqrt(16) = 4`);
+  console.log(`  Final: 1.111 + 4 ≈ 5.111`);
+  console.log(`Result: ${result6}`);
+  console.log('Expected: ~5.111024302164449');
+  console.log(`✓ ${Math.abs(result6 - 5.111024302164449) < 0.000001 ? 'PASS' : 'FAIL'}\n`);
 
   // Test 7: Temperature conversion formula
   console.log('Test 7: Temperature conversion ((tempF - 32) * 5/9)');

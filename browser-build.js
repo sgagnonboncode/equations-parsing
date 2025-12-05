@@ -230,10 +230,7 @@ class FormulaEvaluator {
             const postfix = this.toPostfix(tokens);
             const result = this.evaluatePostfix(postfix, assignment);
 
-            return {
-                result,
-                variables: formulaVariables
-            };
+            return result;
         } catch (error) {
             throw new Error(`Formula evaluation failed: ${error.message}`);
         }
@@ -299,7 +296,7 @@ class FormulaEvaluator {
 
 // Export functions for global use
 window.evaluateFormula = function(formula, variables) {
-    return FormulaEvaluator.evaluate(formula, variables).result;
+    return FormulaEvaluator.evaluate(formula, variables);
 };
 
 window.getFormulaVariables = function(formula) {

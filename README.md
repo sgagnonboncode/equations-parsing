@@ -45,18 +45,18 @@ console.log(variableNames); // ['a', 'b', 'c']
 ### Advanced Usage
 
 ```typescript
-import { FormulaEvaluator, validateFormula } from './src/index';
+import { FormulaEvaluator, validateFormula, getFormulaVariables } from './src/index';
 
 // Validate formula before evaluation
 const formula = '(alpha + beta) * gamma ^ 2';
 if (validateFormula(formula)) {
   const variables = {alpha: 5, beta: 3, gamma: 2};  // Named variable assignments
   const result = FormulaEvaluator.evaluate(formula, variables);
-  console.log(result);
-  // {
-  //   result: 32,
-  //   variables: ['alpha', 'beta', 'gamma']
-  // }
+  console.log(result); // 32
+  
+  // Get variable names separately if needed
+  const variableNames = getFormulaVariables(formula);
+  console.log(variableNames); // ['alpha', 'beta', 'gamma']
 } else {
   console.log('Invalid formula syntax');
 }
@@ -91,7 +91,7 @@ Variables are automatically extracted and sorted alphabetically. Values are prov
 
 ### Classes
 
-- `FormulaEvaluator.evaluate(formula: string, variables: VariableAssignment): EvaluationResult` - Get detailed evaluation result
+- `FormulaEvaluator.evaluate(formula: string, variables: VariableAssignment): number` - Evaluate a formula and return the result
 - `FormulaEvaluator.getVariables(formula: string): string[]` - Extract variables from formula  
 - `FormulaEvaluator.validateFormula(formula: string): boolean` - Validate formula syntax
 

@@ -3,7 +3,6 @@
  */
 export interface EvaluationResult {
   result: number;
-  variables: string[];
 }
 
 /**
@@ -257,9 +256,9 @@ export class FormulaEvaluator {
    * Main evaluation method
    * @param formula Mathematical formula as a string
    * @param variables Object with variable assignments (e.g., {"a": 1, "b": 2})
-   * @returns EvaluationResult containing the computed result and variable names
+   * @returns The computed result as a number
    */
-  static evaluate(formula: string, variables: VariableAssignment): EvaluationResult {
+  static evaluate(formula: string, variables: VariableAssignment): number {
     try {
       // Extract variables from the formula
       const formulaVariables = this.extractVariables(formula);
@@ -280,10 +279,7 @@ export class FormulaEvaluator {
       const postfix = this.toPostfix(tokens);
       const result = this.evaluatePostfix(postfix, assignment);
 
-      return {
-        result,
-        variables: formulaVariables
-      };
+      return result;
     } catch (error) {
       throw new Error(`Formula evaluation failed: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -382,7 +378,7 @@ export class FormulaEvaluator {
  * @returns The computed result as a number
  */
 export function evaluateFormula(formula: string, variables: VariableAssignment): number {
-  return FormulaEvaluator.evaluate(formula, variables).result;
+  return FormulaEvaluator.evaluate(formula, variables);
 }
 
 /**
