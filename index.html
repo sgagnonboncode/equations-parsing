@@ -436,7 +436,7 @@
                 // No variables, evaluate directly
                 const formula = formulaInput.value.trim();
                 try {
-                    const result = window.evaluateFormula(formula, []);
+                    const result = window.evaluateFormula(formula, {});
                     resultLabel.textContent = `Result: ${result}`;
                     resultSection.classList.add('show');
                 } catch (error) {
@@ -446,7 +446,7 @@
             }
             
             // Check if all variables have values
-            const values = [];
+            const variables = {};
             let allFilled = true;
             
             currentVariables.forEach(variable => {
@@ -456,14 +456,14 @@
                 if (isNaN(value) || input.value.trim() === '') {
                     allFilled = false;
                 } else {
-                    values.push(value);
+                    variables[variable] = value;
                 }
             });
             
             if (allFilled) {
                 try {
                     const formula = formulaInput.value.trim();
-                    const result = window.evaluateFormula(formula, values);
+                    const result = window.evaluateFormula(formula, variables);
                     resultLabel.textContent = `Result: ${result}`;
                     resultSection.classList.add('show');
                 } catch (error) {

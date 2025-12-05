@@ -33,13 +33,13 @@ import { evaluateFormula, getFormulaVariables } from './src/index';
 
 // Simple formula
 const formula = 'a + b * c';
-const values = [2, 3, 4];  // a=2, b=3, c=4
-const result = evaluateFormula(formula, values);
+const variables = {a: 2, b: 3, c: 4};  // Clear variable assignments
+const result = evaluateFormula(formula, variables);
 console.log(result); // 14
 
 // Get variables from formula
-const variables = getFormulaVariables(formula);
-console.log(variables); // ['a', 'b', 'c']
+const variableNames = getFormulaVariables(formula);
+console.log(variableNames); // ['a', 'b', 'c']
 ```
 
 ### Advanced Usage
@@ -50,8 +50,8 @@ import { FormulaEvaluator, validateFormula } from './src/index';
 // Validate formula before evaluation
 const formula = '(alpha + beta) * gamma ^ 2';
 if (validateFormula(formula)) {
-  const values = [5, 3, 2];  // alpha=5, beta=3, gamma=2
-  const result = FormulaEvaluator.evaluate(formula, values);
+  const variables = {alpha: 5, beta: 3, gamma: 2};  // Named variable assignments
+  const result = FormulaEvaluator.evaluate(formula, variables);
   console.log(result);
   // {
   //   result: 32,
@@ -79,21 +79,25 @@ Variables must be consecutive alphabetical characters and underscores:
 - Multi-character: `alpha`, `beta`, `gamma`, `temp_celsius`
 - With underscores: `Temperature_fahrenheit`, `var_name`, `my_variable`
 
-Variables are automatically extracted and sorted alphabetically. Values must be provided in the same order as the sorted variable names.
+Variables are automatically extracted and sorted alphabetically. Values are provided as an object with variable names as keys and their numeric values.
 
 ## API Reference
 
 ### Functions
 
-- `evaluateFormula(formula: string, values: number[]): number` - Evaluate a formula and return the result
+- `evaluateFormula(formula: string, variables: VariableAssignment): number` - Evaluate a formula and return the result
 - `getFormulaVariables(formula: string): string[]` - Get variable names from a formula
 - `validateFormula(formula: string): boolean` - Check if a formula is valid without evaluating it
 
 ### Classes
 
-- `FormulaEvaluator.evaluate(formula: string, values: number[]): EvaluationResult` - Get detailed evaluation result
+- `FormulaEvaluator.evaluate(formula: string, variables: VariableAssignment): EvaluationResult` - Get detailed evaluation result
 - `FormulaEvaluator.getVariables(formula: string): string[]` - Extract variables from formula  
 - `FormulaEvaluator.validateFormula(formula: string): boolean` - Validate formula syntax
+
+### Types
+
+- `VariableAssignment` - Object mapping variable names to numeric values: `{[key: string]: number}`
 
 ## Validation
 
@@ -129,24 +133,27 @@ The module provides detailed error messages for:
 - Invalid characters in formulas
 - Mismatched parentheses
 - Division by zero
-- Missing variable values
+- Missing variable values (variables not provided in the assignment object)
 - Invalid expressions
 
 ## Examples
 
 ```typescript
 // Basic arithmetic
-evaluateFormula('a + b', [5, 3]); // 8
+evaluateFormula('a + b', {"a": 5, "b": 3}); // 8
 
 // With parentheses
-evaluateFormula('(a + b) * c', [2, 3, 4]); // 20
+evaluateFormula('(a + b) * c', {"a": 2, "b": 3, "c": 4}); // 20
 
 // Power operation
-evaluateFormula('a ^ b + c', [2, 3, 1]); // 9
+evaluateFormula('a ^ b + c', {"a": 2, "b": 3, "c": 1}); // 9
 
 // Square root
-evaluateFormula('sqrt(a) + b', [16, 4]); // 8
+evaluateFormula('sqrt(a) + b', {"a": 16, "b": 4}); // 8
 
 // Multi-character variables with underscores
-evaluateFormula('Temperature_fahrenheit * conversion_factor', [68, 1.8]); // 122.4
+evaluateFormula('Temperature_fahrenheit * conversion_factor', {
+  "Temperature_fahrenheit": 68, 
+  "conversion_factor": 1.8
+}); // 122.4
 ```

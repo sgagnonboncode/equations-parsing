@@ -256,26 +256,24 @@ export class FormulaEvaluator {
   /**
    * Main evaluation method
    * @param formula Mathematical formula as a string
-   * @param values Array of values corresponding to variables in alphabetical order
+   * @param variables Object with variable assignments (e.g., {"a": 1, "b": 2})
    * @returns EvaluationResult containing the computed result and variable names
    */
-  static evaluate(formula: string, values: number[]): EvaluationResult {
+  static evaluate(formula: string, variables: VariableAssignment): EvaluationResult {
     try {
       // Extract variables from the formula
-      const variables = this.extractVariables(formula);
+      const formulaVariables = this.extractVariables(formula);
       
-      // Validate that we have the correct number of values
-      if (variables.length !== values.length) {
+      // Check if all required variables are provided
+      const missingVariables = formulaVariables.filter(variable => !(variable in variables));
+      if (missingVariables.length > 0) {
         throw new Error(
-          `Expected ${variables.length} values for variables [${variables.join(', ')}], but got ${values.length}`
+          `Missing values for variables: [${missingVariables.join(', ')}]`
         );
       }
 
-      // Create variable assignment map
-      const assignment: VariableAssignment = {};
-      variables.forEach((variable, index) => {
-        assignment[variable] = values[index];
-      });
+      // Use the provided variable assignment directly
+      const assignment = variables;
 
       // Tokenize, convert to postfix, and evaluate
       const tokens = this.tokenize(formula);
@@ -284,7 +282,7 @@ export class FormulaEvaluator {
 
       return {
         result,
-        variables
+        variables: formulaVariables
       };
     } catch (error) {
       throw new Error(`Formula evaluation failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -380,11 +378,11 @@ export class FormulaEvaluator {
 /**
  * Convenience function for formula evaluation
  * @param formula Mathematical formula as a string
- * @param values Array of values corresponding to variables in alphabetical order
+ * @param variables Object with variable assignments (e.g., {"a": 1, "b": 2})
  * @returns The computed result as a number
  */
-export function evaluateFormula(formula: string, values: number[]): number {
-  return FormulaEvaluator.evaluate(formula, values).result;
+export function evaluateFormula(formula: string, variables: VariableAssignment): number {
+  return FormulaEvaluator.evaluate(formula, variables).result;
 }
 
 /**

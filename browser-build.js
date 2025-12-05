@@ -212,20 +212,19 @@ class FormulaEvaluator {
         return stack[0];
     }
 
-    static evaluate(formula, values) {
+    static evaluate(formula, variables) {
         try {
-            const variables = this.extractVariables(formula);
+            // Extract variables from the formula
+            const formulaVariables = this.extractVariables(formula);
             
-            if (variables.length !== values.length) {
-                throw new Error(
-                    `Expected ${variables.length} values for variables [${variables.join(', ')}], but got ${values.length}`
-                );
+            // Check if all required variables are provided
+            const missingVariables = formulaVariables.filter(variable => !(variable in variables));
+            if (missingVariables.length > 0) {
+                throw new Error(`Missing values for variables: [${missingVariables.join(', ')}]`);
             }
 
-            const assignment = {};
-            variables.forEach((variable, index) => {
-                assignment[variable] = values[index];
-            });
+            // Use the provided variable assignment directly
+            const assignment = variables;
 
             const tokens = this.tokenize(formula);
             const postfix = this.toPostfix(tokens);
@@ -233,7 +232,7 @@ class FormulaEvaluator {
 
             return {
                 result,
-                variables
+                variables: formulaVariables
             };
         } catch (error) {
             throw new Error(`Formula evaluation failed: ${error.message}`);
@@ -299,8 +298,8 @@ class FormulaEvaluator {
 }
 
 // Export functions for global use
-window.evaluateFormula = function(formula, values) {
-    return FormulaEvaluator.evaluate(formula, values).result;
+window.evaluateFormula = function(formula, variables) {
+    return FormulaEvaluator.evaluate(formula, variables).result;
 };
 
 window.getFormulaVariables = function(formula) {
