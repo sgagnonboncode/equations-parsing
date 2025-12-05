@@ -283,6 +283,74 @@ export class FormulaEvaluator {
   static getVariables(formula: string): string[] {
     return this.extractVariables(formula);
   }
+
+  /**
+   * Validate if a formula is parsable without evaluating it
+   * @param formula Mathematical formula as a string
+   * @returns true if formula is valid and parsable, false otherwise
+   */
+  static validateFormula(formula: string): boolean {
+    try {
+      // Basic checks
+      if (!formula || formula.trim().length === 0) {
+        return false;
+      }
+
+      // Extract variables to validate the formula structure
+      this.extractVariables(formula);
+      
+      // Tokenize the formula to check for valid tokens
+      const tokens = this.tokenize(formula);
+      
+      // Check for basic token validity
+      if (tokens.length === 0) {
+        return false;
+      }
+      
+      // Check for invalid token sequences
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        const prevToken = i > 0 ? tokens[i - 1] : null;
+        const nextToken = i < tokens.length - 1 ? tokens[i + 1] : null;
+        
+        // Check for operators at invalid positions
+        if (['+', '-', '*', '/', '^'].includes(token)) {
+          // Operators cannot be at the start (except for unary minus, but we don't support that yet)
+          if (i === 0) return false;
+          // Operators cannot be at the end
+          if (i === tokens.length - 1) return false;
+          // Two consecutive operators (except certain cases)
+          if (prevToken && ['+', '-', '*', '/', '^'].includes(prevToken)) return false;
+        }
+        
+        // Check for invalid parenthesis placement
+        if (token === '(') {
+          // Opening parenthesis after variable/number without operator (except sqrt)
+          if (prevToken && /^[a-zA-Z_0-9.]+$/.test(prevToken) && prevToken !== 'sqrt') {
+            return false;
+          }
+        }
+        
+        // Check sqrt usage
+        if (token === 'sqrt') {
+          // sqrt must be followed by opening parenthesis
+          if (!nextToken || nextToken !== '(') return false;
+          
+          // Check for empty sqrt parentheses - sqrt()
+          if (i + 2 < tokens.length && tokens[i + 2] === ')') return false;
+        }
+      }
+      
+      // Convert to postfix to validate syntax and operator precedence
+      this.toPostfix(tokens);
+      
+      // If we get here without exceptions, the formula is valid
+      return true;
+    } catch (error) {
+      // Any parsing error means the formula is invalid
+      return false;
+    }
+  }
 }
 
 /**
@@ -302,4 +370,13 @@ export function evaluateFormula(formula: string, values: number[]): number {
  */
 export function getFormulaVariables(formula: string): string[] {
   return FormulaEvaluator.getVariables(formula);
+}
+
+/**
+ * Validate if a formula is parsable without evaluating it
+ * @param formula Mathematical formula as a string
+ * @returns true if formula is valid and parsable, false otherwise
+ */
+export function validateFormula(formula: string): boolean {
+  return FormulaEvaluator.validateFormula(formula);
 }

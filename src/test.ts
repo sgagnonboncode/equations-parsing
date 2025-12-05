@@ -1,4 +1,4 @@
-import { FormulaEvaluator, evaluateFormula, getFormulaVariables } from './index';
+import { FormulaEvaluator, evaluateFormula, getFormulaVariables, validateFormula } from './index';
 
 // Test cases
 console.log('=== Formula Evaluator Tests ===\n');
@@ -170,6 +170,53 @@ try {
   console.log(`Result: ${result13}`);
   console.log('Expected: 4');
   console.log(`✓ ${result13 === 4 ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 14: Formula validation - valid formulas
+  console.log('Test 14: Formula validation - valid formulas');
+  const validFormulas = [
+    'a + b',
+    '(a + b) * c',
+    'sqrt(a) + b',
+    'sqrt(sqrt(a + b))',
+    'alpha * beta_gamma + sqrt(delta)',
+    'a ^ b / c'
+  ];
+  
+  console.log('Testing valid formulas:');
+  let allValidPass = true;
+  validFormulas.forEach((formula, index) => {
+    const isValid = validateFormula(formula);
+    console.log(`  ${index + 1}. "${formula}" → ${isValid ? '✓ Valid' : '✗ Invalid'}`);
+    if (!isValid) allValidPass = false;
+  });
+  console.log(`All valid formulas test: ${allValidPass ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 15: Formula validation - invalid formulas
+  console.log('Test 15: Formula validation - invalid formulas');
+  const invalidFormulas = [
+    'a +',           // Missing operand
+    '+ b',           // Missing operand
+    '(a + b',        // Mismatched parentheses
+    'a + b)',        // Mismatched parentheses
+    'a ** b',        // Invalid operator
+    'a @ b',         // Invalid character
+    'sqrt',          // Incomplete function
+    '((a + b',       // Multiple mismatched parentheses
+    'a + + b',       // Double operator
+    'a + ((b+c)-d',  // Missing closing parenthesis
+    'a+)b+c)',       // Extra closing parenthesis at start
+    'a+b(+c)',       // Invalid parenthesis placement
+    'a + sqrt)b)'    // Invalid sqrt syntax with misplaced parentheses
+  ];
+  
+  console.log('Testing invalid formulas:');
+  let allInvalidPass = true;
+  invalidFormulas.forEach((formula, index) => {
+    const isValid = validateFormula(formula);
+    console.log(`  ${index + 1}. "${formula}" → ${isValid ? '✗ Valid (should be invalid)' : '✓ Invalid'}`);
+    if (isValid) allInvalidPass = false;
+  });
+  console.log(`All invalid formulas test: ${allInvalidPass ? 'PASS' : 'FAIL'}\n`);
 
   console.log('=== All tests completed successfully! ===');
 
