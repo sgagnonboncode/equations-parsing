@@ -206,7 +206,8 @@ try {
     'a + ((b+c)-d',  // Missing closing parenthesis
     'a+)b+c)',       // Extra closing parenthesis at start
     'a+b(+c)',       // Invalid parenthesis placement
-    'a + sqrt)b)'    // Invalid sqrt syntax with misplaced parentheses
+    'a + sqrt)b)',   // Invalid sqrt syntax with misplaced parentheses
+    'sqrt(a) + b4b4' // Invalid variable name with numbers
   ];
   
   console.log('Testing invalid formulas:');

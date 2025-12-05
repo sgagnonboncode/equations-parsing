@@ -79,13 +79,23 @@ export class FormulaEvaluator {
       // Variables (consecutive alphabetical characters and underscores)
       else if (/[a-zA-Z]/.test(formula[i])) {
         let variable = '';
-        while (i < formula.length && /[a-zA-Z_]/.test(formula[i])) {
+        let hasInvalidSequence = false;
+        
+        while (i < formula.length && /[a-zA-Z_0-9]/.test(formula[i])) {
+          if (/\d/.test(formula[i]) && variable.length > 0) {
+            // Found a number after letters - this is invalid
+            hasInvalidSequence = true;
+          }
           variable += formula[i];
           i++;
         }
         
-        tokens.push(variable);
+        // Check for invalid patterns like mixing letters and numbers
+        if (hasInvalidSequence || /\d/.test(variable)) {
+          throw new Error(`Invalid variable name: ${variable}. Variable names can only contain letters and underscores.`);
+        }
         
+        tokens.push(variable);
       }
       // Operators and parentheses
       else if (this.OPERATORS.includes(formula[i])) {
