@@ -295,6 +295,8 @@ class FormulaEvaluator {
 }
 
 // Export functions for global use
+window.FormulaEvaluator = FormulaEvaluator;
+
 window.evaluateFormula = function(formula, variables) {
     return FormulaEvaluator.evaluate(formula, variables);
 };
@@ -305,4 +307,13 @@ window.getFormulaVariables = function(formula) {
 
 window.validateFormula = function(formula) {
     return FormulaEvaluator.validateFormula(formula);
+};
+
+window.getFormulaTokens = function(formula) {
+    return FormulaEvaluator.tokenize(formula);
+};
+
+window.getFormulaPostfix = function(formula) {
+    const tokens = FormulaEvaluator.tokenize(formula);
+    return FormulaEvaluator.toPostfix(tokens);
 };
