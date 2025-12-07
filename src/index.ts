@@ -1,11 +1,4 @@
 /**
- * Interface for the result of formula evaluation
- */
-export interface EvaluationResult {
-  result: number;
-}
-
-/**
  * Interface for variable assignments
  */
 export interface VariableAssignment {
