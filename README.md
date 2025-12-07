@@ -6,15 +6,14 @@ A TypeScript module for parsing and evaluating mathematical formulas with alphab
 
 **[Try the Interactive Demo](https://sgagnonboncode.github.io/equations-parsing/)**
 
-The demo website showcases all features with real-time validation, dynamic variable inputs, and live calculations.
-
 ## Features
 
 - Parse mathematical formulas with variables represented by consecutive alphabetical characters and underscores
 - Support for basic arithmetic operations: `+`, `-`, `*`, `/`, `^` (power), `sqrt` (square root)
 - Support for parentheses for operation precedence
 - Multi-character variable names (e.g., `alpha`, `beta`, `gamma`)
-- Automatic variable extraction and sorting
+- Dictionary-based variable assignment for clear, order-independent input
+- Real-time formula validation and interactive debugging
 - Type-safe TypeScript implementation
 
 ## Installation
@@ -85,12 +84,6 @@ Variables are automatically extracted and sorted alphabetically. Values are prov
 
 ### Functions
 
-- `evaluateFormula(formula: string, variables: VariableAssignment): number` - Evaluate a formula and return the result
-- `getFormulaVariables(formula: string): string[]` - Get variable names from a formula
-- `validateFormula(formula: string): boolean` - Check if a formula is valid without evaluating it
-
-### Classes
-
 - `FormulaEvaluator.evaluate(formula: string, variables: VariableAssignment): number` - Evaluate a formula and return the result
 - `FormulaEvaluator.getVariables(formula: string): string[]` - Extract variables from formula  
 - `FormulaEvaluator.validateFormula(formula: string): boolean` - Validate formula syntax
@@ -140,20 +133,29 @@ The module provides detailed error messages for:
 
 ```typescript
 // Basic arithmetic
-evaluateFormula('a + b', {"a": 5, "b": 3}); // 8
+evaluateFormula('a + b', {a: 5, b: 3}); // 8
 
-// With parentheses
-evaluateFormula('(a + b) * c', {"a": 2, "b": 3, "c": 4}); // 20
+// With parentheses  
+evaluateFormula('(a + b) * c', {a: 2, b: 3, c: 4}); // 20
 
 // Power operation
-evaluateFormula('a ^ b + c', {"a": 2, "b": 3, "c": 1}); // 9
+evaluateFormula('a ^ b + c', {a: 2, b: 3, c: 1}); // 9
 
 // Square root
-evaluateFormula('sqrt(a) + b', {"a": 16, "b": 4}); // 8
+evaluateFormula('sqrt(a) + b', {a: 16, b: 4}); // 8
+
+// Complex nested formula
+evaluateFormula('sqrt((a + b) ^ 2 + c * d) / (e - f) + sqrt(g)', {
+  a: 3, b: 4, c: 5, d: 6, e: 10, f: 2, g: 16
+}); // ~5.111
 
 // Multi-character variables with underscores
 evaluateFormula('Temperature_fahrenheit * conversion_factor', {
-  "Temperature_fahrenheit": 68, 
-  "conversion_factor": 1.8
+  Temperature_fahrenheit: 68, 
+  conversion_factor: 1.8
 }); // 122.4
 ```
+
+## References
+
+- [Shunting Yard Algorithm - Brilliant.org](https://brilliant.org/wiki/shunting-yard-algorithm)

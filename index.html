@@ -631,7 +631,6 @@
                     const postfix = window.getFormulaPostfix(formula);
                     postfixText = Array.isArray(postfix) ? postfix.join(' ') : String(postfix);
                 } catch (postfixError) {
-                    console.log('Postfix error:', postfixError);
                     postfixText = 'Error: ' + postfixError.message;
                 }
                 
@@ -640,7 +639,6 @@
                 
                 debugSection.classList.add('show');
             } catch (error) {
-                console.log('Debug error:', error);
                 debugSection.classList.remove('show');
             }
         }
