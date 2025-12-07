@@ -455,8 +455,13 @@
         </div>
     </div>
 
-    <!-- Include the compiled JavaScript -->
-    <script src="browser-build.js"></script>
+    <!-- Include the compiled JavaScript with cache busting -->
+    <script>
+        // Cache-busting mechanism for browser-build.js
+        const script = document.createElement('script');
+        script.src = 'browser-build.js?v=' + Date.now();
+        document.head.appendChild(script);
+    </script>
     
     <script>
         // Get references to DOM elements
