@@ -1,4 +1,4 @@
-import { FormulaEvaluator, evaluateFormula, getFormulaVariables, validateFormula } from './index';
+import { FormulaEvaluator, evaluateFormula, getFormulaVariables, validateFormula, formulaToAST } from './index';
 
 // Test cases
 console.log('=== Formula Evaluator Tests ===\n');
@@ -254,6 +254,162 @@ try {
     if (!isValid) allPreviousValid = false;
   });
   console.log(`All previous test formulas validation: ${allPreviousValid ? 'PASS' : 'FAIL'}\n`);
+
+  // AST Tests
+  console.log('=== AST (Abstract Syntax Tree) Tests ===\n');
+
+  // Test 17: Simple AST - addition
+  console.log('Test 17: AST for simple addition (a + b)');
+  const astFormula1 = 'a + b';
+  const ast1 = formulaToAST(astFormula1);
+  const expectedAst1 = {
+    type: 'operator',
+    value: '+',
+    left: { type: 'variable', value: 'a' },
+    right: { type: 'variable', value: 'b' }
+  };
+  const ast1Match = JSON.stringify(ast1) === JSON.stringify(expectedAst1);
+  console.log(`Formula: ${astFormula1}`);
+  console.log(`AST: ${JSON.stringify(ast1)}`);
+  console.log(`✓ ${ast1Match ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 18: AST with parentheses and multiplication
+  console.log('Test 18: AST for expression with parentheses ((a + b) * c)');
+  const astFormula2 = '(a + b) * c';
+  const ast2 = formulaToAST(astFormula2);
+  const expectedAst2 = {
+    type: 'operator',
+    value: '*',
+    left: {
+      type: 'operator',
+      value: '+',
+      left: { type: 'variable', value: 'a' },
+      right: { type: 'variable', value: 'b' }
+    },
+    right: { type: 'variable', value: 'c' }
+  };
+  const ast2Match = JSON.stringify(ast2) === JSON.stringify(expectedAst2);
+  console.log(`Formula: ${astFormula2}`);
+  console.log(`AST: ${JSON.stringify(ast2, null, 2)}`);
+  console.log(`✓ ${ast2Match ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 19: AST with sqrt function
+  console.log('Test 19: AST for sqrt function (sqrt(a) + b)');
+  const astFormula3 = 'sqrt(a) + b';
+  const ast3 = formulaToAST(astFormula3);
+  const expectedAst3 = {
+    type: 'operator',
+    value: '+',
+    left: {
+      type: 'function',
+      value: 'sqrt',
+      operand: { type: 'variable', value: 'a' }
+    },
+    right: { type: 'variable', value: 'b' }
+  };
+  const ast3Match = JSON.stringify(ast3) === JSON.stringify(expectedAst3);
+  console.log(`Formula: ${astFormula3}`);
+  console.log(`AST: ${JSON.stringify(ast3, null, 2)}`);
+  console.log(`✓ ${ast3Match ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 20: AST with numbers and power operation
+  console.log('Test 20: AST for power operation with numbers (a ^ 2 + 3)');
+  const astFormula4 = 'a ^ 2 + 3';
+  const ast4 = formulaToAST(astFormula4);
+  const expectedAst4 = {
+    type: 'operator',
+    value: '+',
+    left: {
+      type: 'operator',
+      value: '^',
+      left: { type: 'variable', value: 'a' },
+      right: { type: 'number', value: 2 }
+    },
+    right: { type: 'number', value: 3 }
+  };
+  const ast4Match = JSON.stringify(ast4) === JSON.stringify(expectedAst4);
+  console.log(`Formula: ${astFormula4}`);
+  console.log(`AST: ${JSON.stringify(ast4, null, 2)}`);
+  console.log(`✓ ${ast4Match ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 21: Complex AST - nested formula with multiple operations
+  console.log('Test 21: Complex AST for nested formula (sqrt((a + b) ^ 2 + c * d) / (e - f))');
+  const astFormula5 = 'sqrt((a + b) ^ 2 + c * d) / (e - f)';
+  const ast5 = formulaToAST(astFormula5);
+  const expectedAst5 = {
+    type: 'operator',
+    value: '/',
+    left: {
+      type: 'function',
+      value: 'sqrt',
+      operand: {
+        type: 'operator',
+        value: '+',
+        left: {
+          type: 'operator',
+          value: '^',
+          left: {
+            type: 'operator',
+            value: '+',
+            left: { type: 'variable', value: 'a' },
+            right: { type: 'variable', value: 'b' }
+          },
+          right: { type: 'number', value: 2 }
+        },
+        right: {
+          type: 'operator',
+          value: '*',
+          left: { type: 'variable', value: 'c' },
+          right: { type: 'variable', value: 'd' }
+        }
+      }
+    },
+    right: {
+      type: 'operator',
+      value: '-',
+      left: { type: 'variable', value: 'e' },
+      right: { type: 'variable', value: 'f' }
+    }
+  };
+  const ast5Match = JSON.stringify(ast5) === JSON.stringify(expectedAst5);
+  console.log(`Formula: ${astFormula5}`);
+  console.log(`AST Structure:`);
+  console.log(JSON.stringify(ast5, null, 2));
+  console.log(`✓ ${ast5Match ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 22: AST with nested sqrt functions
+  console.log('Test 22: AST for nested sqrt functions (sqrt(sqrt(x + y)))');
+  const astFormula6 = 'sqrt(sqrt(x + y))';
+  const ast6 = formulaToAST(astFormula6);
+  const expectedAst6 = {
+    type: 'function',
+    value: 'sqrt',
+    operand: {
+      type: 'function',
+      value: 'sqrt',
+      operand: {
+        type: 'operator',
+        value: '+',
+        left: { type: 'variable', value: 'x' },
+        right: { type: 'variable', value: 'y' }
+      }
+    }
+  };
+  const ast6Match = JSON.stringify(ast6) === JSON.stringify(expectedAst6);
+  console.log(`Formula: ${astFormula6}`);
+  console.log(`AST: ${JSON.stringify(ast6, null, 2)}`);
+  console.log(`✓ ${ast6Match ? 'PASS' : 'FAIL'}\n`);
+
+  // Test 23: AST error handling - invalid formula
+  console.log('Test 23: AST error handling for invalid formula (a +)');
+  try {
+    const astFormula7 = 'a +';
+    const ast7 = formulaToAST(astFormula7);
+    console.log('✗ FAIL: Should have thrown an error for invalid formula\n');
+  } catch (error) {
+    console.log(`Error caught: ${error instanceof Error ? error.message : String(error)}`);
+    console.log('✓ PASS: Correctly rejected invalid formula\n');
+  }
 
   console.log('=== All tests completed successfully! ===');
 

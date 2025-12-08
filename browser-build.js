@@ -292,6 +292,72 @@ class FormulaEvaluator {
             return false;
         }
     }
+
+    static postfixToAST(postfix) {
+        const stack = [];
+
+        for (const token of postfix) {
+            // Numbers
+            if (/^\d+\.?\d*$/.test(token)) {
+                stack.push({
+                    type: 'number',
+                    value: parseFloat(token)
+                });
+            }
+            // Variables
+            else if (/^[a-zA-Z_]+$/.test(token) && token !== 'sqrt') {
+                stack.push({
+                    type: 'variable',
+                    value: token
+                });
+            }
+            // sqrt function (unary)
+            else if (token === 'sqrt') {
+                if (stack.length < 1) {
+                    throw new Error(`Insufficient operands for sqrt function`);
+                }
+                const operand = stack.pop();
+                stack.push({
+                    type: 'function',
+                    value: 'sqrt',
+                    operand: operand
+                });
+            }
+            // Binary operators
+            else if (token in this.PRECEDENCE && token !== 'sqrt') {
+                if (stack.length < 2) {
+                    throw new Error(`Insufficient operands for operator '${token}'`);
+                }
+                const right = stack.pop();
+                const left = stack.pop();
+                stack.push({
+                    type: 'operator',
+                    value: token,
+                    left: left,
+                    right: right
+                });
+            }
+            else {
+                throw new Error(`Unknown token in postfix: ${token}`);
+            }
+        }
+
+        if (stack.length !== 1) {
+            throw new Error('Invalid expression: AST construction failed');
+        }
+
+        return stack[0];
+    }
+
+    static toAST(formula) {
+        try {
+            const tokens = this.tokenize(formula);
+            const postfix = this.toPostfix(tokens);
+            return this.postfixToAST(postfix);
+        } catch (error) {
+            throw new Error(`AST conversion failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
 }
 
 // Export functions for global use
@@ -316,4 +382,12 @@ window.getFormulaTokens = function(formula) {
 window.getFormulaPostfix = function(formula) {
     const tokens = FormulaEvaluator.tokenize(formula);
     return FormulaEvaluator.toPostfix(tokens);
+};
+
+window.formulaToAST = function(formula) {
+    return FormulaEvaluator.toAST(formula);
+};
+
+window.formulaToAST = function(formula) {
+    return FormulaEvaluator.toAST(formula);
 };

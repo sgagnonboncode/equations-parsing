@@ -6,6 +6,17 @@ export interface VariableAssignment {
 }
 
 /**
+ * Interface for AST (Abstract Syntax Tree) nodes
+ */
+export interface ASTNode {
+  type: 'operator' | 'function' | 'variable' | 'number';
+  value: string | number;
+  left?: ASTNode;
+  right?: ASTNode;
+  operand?: ASTNode;  // For unary functions like sqrt
+}
+
+/**
  * Formula evaluator class that parses mathematical expressions 
  * and evaluates them with given variable values
  */
@@ -288,6 +299,82 @@ export class FormulaEvaluator {
   }
 
   /**
+   * Convert postfix notation to Abstract Syntax Tree (AST) in dictionary format
+   * @param postfix Array of tokens in postfix notation
+   * @returns AST root node representing the mathematical expression
+   */
+  private static postfixToAST(postfix: string[]): ASTNode {
+    const stack: ASTNode[] = [];
+
+    for (const token of postfix) {
+      // Numbers
+      if (/^\d+\.?\d*$/.test(token)) {
+        stack.push({
+          type: 'number',
+          value: parseFloat(token)
+        });
+      }
+      // Variables
+      else if (/^[a-zA-Z_]+$/.test(token) && token !== 'sqrt') {
+        stack.push({
+          type: 'variable',
+          value: token
+        });
+      }
+      // sqrt function (unary)
+      else if (token === 'sqrt') {
+        if (stack.length < 1) {
+          throw new Error(`Insufficient operands for sqrt function`);
+        }
+        const operand = stack.pop()!;
+        stack.push({
+          type: 'function',
+          value: 'sqrt',
+          operand: operand
+        });
+      }
+      // Binary operators
+      else if (token in this.PRECEDENCE && token !== 'sqrt') {
+        if (stack.length < 2) {
+          throw new Error(`Insufficient operands for operator '${token}'`);
+        }
+        const right = stack.pop()!;
+        const left = stack.pop()!;
+        stack.push({
+          type: 'operator',
+          value: token,
+          left: left,
+          right: right
+        });
+      }
+      else {
+        throw new Error(`Unknown token in postfix: ${token}`);
+      }
+    }
+
+    if (stack.length !== 1) {
+      throw new Error('Invalid expression: AST construction failed');
+    }
+
+    return stack[0];
+  }
+
+  /**
+   * Convert formula to Abstract Syntax Tree (AST) in dictionary format
+   * @param formula Mathematical formula as a string
+   * @returns AST root node representing the mathematical expression
+   */
+  static toAST(formula: string): ASTNode {
+    try {
+      const tokens = this.tokenize(formula);
+      const postfix = this.toPostfix(tokens);
+      return this.postfixToAST(postfix);
+    } catch (error) {
+      throw new Error(`AST conversion failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
    * Validate if a formula is parsable without evaluating it
    * @param formula Mathematical formula as a string
    * @returns true if formula is valid and parsable, false otherwise
@@ -390,4 +477,13 @@ export function getFormulaVariables(formula: string): string[] {
  */
 export function validateFormula(formula: string): boolean {
   return FormulaEvaluator.validateFormula(formula);
+}
+
+/**
+ * Convert formula to Abstract Syntax Tree (AST) in dictionary format
+ * @param formula Mathematical formula as a string
+ * @returns AST root node representing the mathematical expression
+ */
+export function formulaToAST(formula: string): ASTNode {
+  return FormulaEvaluator.toAST(formula);
 }

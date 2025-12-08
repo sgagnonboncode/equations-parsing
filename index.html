@@ -420,6 +420,12 @@
                         <pre></pre>
                     </div>
                 </div>
+                <div class="debug-item">
+                    <div class="debug-label">Abstract Syntax Tree (AST):</div>
+                    <div id="debugAST" class="debug-value">
+                        <pre></pre>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -476,6 +482,7 @@
         const debugFormula = document.getElementById('debugFormula');
         const debugPostfix = document.getElementById('debugPostfix');
         const debugVariables = document.getElementById('debugVariables');
+        const debugAST = document.getElementById('debugAST');
         
         let currentVariables = [];
         let variableElements = {};
@@ -636,6 +643,17 @@
                 
                 debugPostfix.textContent = postfixText;
                 debugVariables.querySelector('pre').textContent = JSON.stringify(variables, null, 2);
+                
+                // Try to get AST with error handling
+                let astText = 'N/A';
+                try {
+                    const ast = window.formulaToAST(formula);
+                    astText = JSON.stringify(ast, null, 2);
+                } catch (astError) {
+                    astText = 'Error: ' + astError.message;
+                }
+                
+                debugAST.querySelector('pre').textContent = astText;
                 
                 debugSection.classList.add('show');
             } catch (error) {
